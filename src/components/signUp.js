@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useHistory } from "react-router-dom";
 
 const SignUp = () => {
+    const history = useHistory();
+    const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(auth, email, password);
+
+        // Eメール/パスワード方式でユーザ登録を行う。
+        // firebase ver9から記法が変更したらしく、
+        // 第一引数にauthを渡す + 非同期として定義してあげないとエラーにはまる（はまった）ので注意
         createUserWithEmailAndPassword(auth, email, password)
-            .then(() => console.log('成功'))
-            .catch(() => console.log('失敗'));
+            .then((res) => history.push('/'))
+            .catch((err) => setError(err.message));
     }
 
     const handleChangeEmail = (event) => {
@@ -24,6 +30,7 @@ const SignUp = () => {
     return (
         <div>
             <h1>ユーザ登録</h1>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>メールアドレス</label>
